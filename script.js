@@ -1,7 +1,7 @@
-    // Replace with your own ThingSpeak Channel ID.
+    // Thingspeak ID
     const CHANNEL_ID = "3532598";
 
-    // The channel must have Public View enabled.
+    // Publicview täytyy olla päällä
     const API_URL =
       `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=300`;
 
@@ -117,7 +117,7 @@
           "Last sensor reading: " +
           latest.time.toLocaleString();
 
-        // Show the last 24 hours using the browser's local time.
+        // Näytä viimeiset 24h käyttäen selaimen aikaa
         const cutoff = Date.now() - 24 * 60 * 60 * 1000;
 
         const history = readings.filter(item =>
@@ -141,7 +141,7 @@
           " readings in the last 24 hours. " +
           "Website refreshes every minute.";
 
-        // Warn if the sensor has stopped reporting.
+        // Varoitus, jos anturi ei toimi
         const ageMinutes =
           (Date.now() - latest.time.getTime()) / 60000;
 
@@ -165,5 +165,5 @@
 
     updateTemperature();
 
-    // Refresh the website data every 60 seconds.
+    // Päivitä sivua 60 sec välein
     setInterval(updateTemperature, 60000);
