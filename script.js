@@ -1,7 +1,8 @@
-    // Replace with your own ThingSpeak Channel ID.
+
+    // Thingspeak ID
     const CHANNEL_ID = "3532598";
 
-    // The channel must have Public View enabled.
+    // Publicview täytyy olla päällä
     const API_URL =
       `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=300`;
 
@@ -13,6 +14,12 @@
 
     const chartStatus =
       document.getElementById("chartStatus");
+
+    const resetStatus =
+      document.getElementById("resetStatus");
+
+    const resetButton =
+      document.getElementById("resetButton");
 
     const ctx =
       document.getElementById("temperatureChart");
@@ -72,11 +79,27 @@
       }
     });
 
-    async function updateTemperature() {
+    let isLoading = false;
+
+    async function updateTemperature(isReset = false) {
+      if (isLoading) return;
+
+      isLoading = true;
+      resetButton.disabled = true;
+
+      if (isReset) {
+        resetButton.textContent = "Reloading...";
+        resetStatus.textContent =
+          "Fetching data from ThingSpeak...";
+      }
+
       try {
-        const response = await fetch(API_URL, {
-          cache: "no-store"
-        });
+        const response = await fetch(
+          API_URL + "&_=" + Date.now(),
+          {
+            cache: "no-store"
+          }
+        );
 
         if (!response.ok) {
           throw new Error("HTTP " + response.status);
@@ -105,11 +128,21 @@
             "No readings yet. Check the ESP32.";
           chartStatus.textContent =
             "No temperature history available.";
+          chart.data.labels = [];
+          chart.data.datasets[0].data = [];
+          chart.update();
+
+          if (isReset) {
+            resetStatus.textContent =
+              "No readings were found.";
+          }
+
           return;
         }
 
         const latest = readings[readings.length - 1];
 
+        // Display latest temperature
         temperatureElement.textContent =
           latest.temp.toFixed(1) + "°C";
 
@@ -117,7 +150,7 @@
           "Last sensor reading: " +
           latest.time.toLocaleString();
 
-        // Show the last 24 hours using the browser's local time.
+        // Näytä viimeiset 24h käyttäen selaimen aikaa
         const cutoff = Date.now() - 24 * 60 * 60 * 1000;
 
         const history = readings.filter(item =>
@@ -141,7 +174,12 @@
           " readings in the last 24 hours. " +
           "Website refreshes every minute.";
 
-        // Warn if the sensor has stopped reporting.
+        if (isReset) {
+          resetStatus.textContent =
+            "Refreshed!";
+        }
+
+        // Varoitus, jos anturi ei toimi
         const ageMinutes =
           (Date.now() - latest.time.getTime()) / 60000;
 
@@ -160,10 +198,23 @@
         updatedElement.classList.add("error");
         chartStatus.textContent =
           "Check your internet connection and ThingSpeak channel settings.";
+
+        if (isReset) {
+          resetStatus.textContent =
+            "Could not refresh. Please try again.";
+        }
+      } finally {
+        isLoading = false;
+        resetButton.disabled = false;
+        resetButton.textContent = "↻ Refresh";
       }
     }
 
+    resetButton.addEventListener("click", () => {
+      updateTemperature(true);
+    });
+
     updateTemperature();
 
-    // Refresh the website data every 60 seconds.
+    // Päivitä sivua 60 sec välein
     setInterval(updateTemperature, 60000);
