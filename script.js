@@ -176,7 +176,7 @@
 
         if (isReset) {
           resetStatus.textContent =
-            "History reloaded successfully!";
+            "Refreshed!";
         }
 
         // Varoitus, jos anturi ei toimi
@@ -201,12 +201,12 @@
 
         if (isReset) {
           resetStatus.textContent =
-            "Could not reload history. Please try again.";
+            "Could not refresh. Please try again.";
         }
       } finally {
         isLoading = false;
         resetButton.disabled = false;
-        resetButton.textContent = "↻ Reset History";
+        resetButton.textContent = "↻ Refresh";
       }
     }
 
