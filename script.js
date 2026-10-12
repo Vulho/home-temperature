@@ -15,11 +15,14 @@
     const chartStatus =
       document.getElementById("chartStatus");
 
-    const ctx =
-      document.getElementById("temperatureChart");
+    const resetStatus =
+      document.getElementById("resetStatus");
 
     const resetButton =
       document.getElementById("resetButton");
+
+    const ctx =
+      document.getElementById("temperatureChart");
 
     const chart = new Chart(ctx, {
       type: "line",
@@ -76,13 +79,18 @@
       }
     });
 
-    async function updateTemperature(isReset = false) {
-      if (resetButton) {
-        resetButton.disabled = true;
+    let isLoading = false;
 
-        if (isReset) {
-          resetButton.textContent = "Reloading...";
-        }
+    async function updateTemperature(isReset = false) {
+      if (isLoading) return;
+
+      isLoading = true;
+      resetButton.disabled = true;
+
+      if (isReset) {
+        resetButton.textContent = "Reloading...";
+        resetStatus.textContent =
+          "Fetching fresh history from ThingSpeak...";
       }
 
       try {
@@ -120,11 +128,21 @@
             "No readings yet. Check the ESP32.";
           chartStatus.textContent =
             "No temperature history available.";
+          chart.data.labels = [];
+          chart.data.datasets[0].data = [];
+          chart.update();
+
+          if (isReset) {
+            resetStatus.textContent =
+              "No readings were found.";
+          }
+
           return;
         }
 
         const latest = readings[readings.length - 1];
 
+        // Display latest temperature
         temperatureElement.textContent =
           latest.temp.toFixed(1) + "°C";
 
@@ -155,12 +173,10 @@
           history.length +
           " readings in the last 24 hours. " +
           "Website refreshes every minute.";
-        // reset
+
         if (isReset) {
-          chartStatus.textContent =
-            "History reloaded! " +
-            history.length +
-            " readings in the last 24 hours.";
+          resetStatus.textContent =
+            "History reloaded successfully!";
         }
 
         // Varoitus, jos anturi ei toimi
@@ -182,19 +198,21 @@
         updatedElement.classList.add("error");
         chartStatus.textContent =
           "Check your internet connection and ThingSpeak channel settings.";
-      } finally {
-        if (resetButton) {
-          resetButton.disabled = false;
-          resetButton.textContent = "↻ Reset History";
+
+        if (isReset) {
+          resetStatus.textContent =
+            "Could not reload history. Please try again.";
         }
+      } finally {
+        isLoading = false;
+        resetButton.disabled = false;
+        resetButton.textContent = "↻ Reset History";
       }
     }
-    // Kuuntelee painetaanko nappia
-    if (resetButton) {
-      resetButton.addEventListener("click", () => {
-        updateTemperature(true);
-      });
-    }
+
+    resetButton.addEventListener("click", () => {
+      updateTemperature(true);
+    });
 
     updateTemperature();
 
