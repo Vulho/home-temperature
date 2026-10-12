@@ -1,5 +1,5 @@
     // Replace with your own ThingSpeak Channel ID.
-    const CHANNEL_ID = "YOUR_CHANNEL_ID";
+    const CHANNEL_ID = "3532598";
 
     // The channel must have Public View enabled.
     const API_URL =
