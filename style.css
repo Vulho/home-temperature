@@ -1,5 +1,5 @@
 
-/* Reset History button */
+/* resetointi painike historiealle */
 #resetButton {
     background: linear-gradient(135deg, #2563eb, #1d4ed8);
     color: white;
@@ -13,19 +13,19 @@
     transition: all 0.2s ease;
 }
 
-/* Hover effect */
+/* Jos käyttäjä leijuu painikkeen päällä */
 #resetButton:hover {
     background: linear-gradient(135deg, #1d4ed8, #1e40af);
     transform: translateY(-2px);
     box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
 }
 
-/* Click effect */
+/* klikkaus */
 #resetButton:active {
     transform: translateY(0) scale(0.97);
 }
 
-/* Disabled while loading */
+/* Pois käytöstä, kun ladataan */
 #resetButton:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -33,7 +33,7 @@
     box-shadow: none;
 }
 
-/* Status message */
+/* Status */
 #resetStatus {
     font-size: 13px;
     color: #64748b;
