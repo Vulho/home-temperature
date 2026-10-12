@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home Temperature</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px 16px;
+      background: #0b1120;
+      color: #f1f5f9;
+      font-family: Arial, sans-serif;
+    }
+
+    main {
+      max-width: 850px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin: 12px 0 28px;
+    }
+
+    header h1 {
+      font-size: clamp(26px, 5vw, 36px);
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: #94a3b8;
+      margin: 0;
+    }
+
+    .card {
+      background: #151f32;
+      border: 1px solid #263449;
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 18px;
+    }
+
+    .label {
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    .temperature {
+      font-size: clamp(52px, 12vw, 76px);
+      font-weight: bold;
+      margin: 14px 0;
+      letter-spacing: -3px;
+    }
+
+    .status {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    .status.error {
+      color: #fca5a5;
+    }
+
+    .chart-heading {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .chart-heading h2 {
+      margin: 0;
+      font-size: 19px;
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 280px;
+    }
+
+    footer {
+      color: #64748b;
+      font-size: 12px;
+      text-align: center;
+      margin: 24px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <header>
+      <h1>Home Temperature</h1>
+      <p>Live readings from my ESP32-C3 temperature sensor</p>
+    </header>
+
+    <section class="card">
+      <div class="label">CURRENT TEMPERATURE</div>
+      <div class="temperature" id="temperature">--.-°C</div>
+      <div class="status" id="updated">Waiting for sensor data...</div>
+    </section>
+
+    <section class="card">
+      <div class="chart-heading">
+        <h2>Last 24 hours</h2>
+        <span class="label">Temperature (°C)</span>
+      </div>
+
+      <div class="chart-wrap">
+        <canvas id="temperatureChart"></canvas>
+      </div>
+
+      <div class="status" id="chartStatus" style="margin-top: 14px;">
+        Loading history...
+      </div>
+    </section>
+
+    <footer>
+      Powered by ESP32-C3, DHT11 and ThingSpeak
+    </footer>
+  </main>
+
+<script src="script.js"></script>
+</body>
+</html>
