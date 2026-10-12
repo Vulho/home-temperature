@@ -1,3 +1,4 @@
+
     // Thingspeak ID
     const CHANNEL_ID = "3532598";
 
@@ -16,6 +17,9 @@
 
     const ctx =
       document.getElementById("temperatureChart");
+
+    const resetButton =
+      document.getElementById("resetButton");
 
     const chart = new Chart(ctx, {
       type: "line",
@@ -72,11 +76,22 @@
       }
     });
 
-    async function updateTemperature() {
+    async function updateTemperature(isReset = false) {
+      if (resetButton) {
+        resetButton.disabled = true;
+
+        if (isReset) {
+          resetButton.textContent = "Reloading...";
+        }
+      }
+
       try {
-        const response = await fetch(API_URL, {
-          cache: "no-store"
-        });
+        const response = await fetch(
+          API_URL + "&_=" + Date.now(),
+          {
+            cache: "no-store"
+          }
+        );
 
         if (!response.ok) {
           throw new Error("HTTP " + response.status);
@@ -140,6 +155,13 @@
           history.length +
           " readings in the last 24 hours. " +
           "Website refreshes every minute.";
+        // reset
+        if (isReset) {
+          chartStatus.textContent =
+            "History reloaded! " +
+            history.length +
+            " readings in the last 24 hours.";
+        }
 
         // Varoitus, jos anturi ei toimi
         const ageMinutes =
@@ -160,7 +182,18 @@
         updatedElement.classList.add("error");
         chartStatus.textContent =
           "Check your internet connection and ThingSpeak channel settings.";
+      } finally {
+        if (resetButton) {
+          resetButton.disabled = false;
+          resetButton.textContent = "↻ Reset History";
+        }
       }
+    }
+    // Kuuntelee painetaanko nappia
+    if (resetButton) {
+      resetButton.addEventListener("click", () => {
+        updateTemperature(true);
+      });
     }
 
     updateTemperature();
